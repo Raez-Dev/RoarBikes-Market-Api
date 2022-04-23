@@ -8,7 +8,7 @@ const PATH: string = './dist/resources/Products.txt';
 
 export class ProductRepositoryImpl_Local implements ProductRepository {
 
-    findById = async (id: number): Promise<ResponseModel<Product>> => {
+    findById = async (id: string): Promise<ResponseModel<Product>> => {
 
         let rm = new ResponseModel<Product>();
 
@@ -20,16 +20,16 @@ export class ProductRepositoryImpl_Local implements ProductRepository {
                 rm.msg = "Empty product list";
             } else {
                 let products = JSON.parse(fileContent);
-                if (id === 0) {
+                if (id === '0') {
 
                     rm.isSuccess = true;
                     rm.msg = "Success";
                     rm.data = products;
 
-                } else {                    
-                    const product: Product = products.find((item: Product) => item.id === id)
-                    
-                    if (Object.keys(product).length === 0 ) {
+                } else {
+                    const product: Product = products.find((item: Product) => item._id === id)
+
+                    if (Object.keys(product).length === 0) {
                         rm.isSuccess = false;
                         rm.msg = "Product not found";
                     } else {
@@ -57,12 +57,12 @@ export class ProductRepositoryImpl_Local implements ProductRepository {
 
             if (fileContent === "" || fileContent === "[]") {
 
-                let products: Array<Product> = [{ ...item, "id": 1 }];
+                let products: Array<Product> = [{ ...item, "_id": '1' }];
                 try {
                     await fs.promises.writeFile(`${PATH}`, JSON.stringify(products));
                     rm.isSuccess = true;
                     rm.msg = "Product saved!";
-                    rm.entity = { ...item, "id": 1 };
+                    rm.entity = { ...item, "_id": '1' };
                 } catch (error1) {
                     rm.isSuccess = false;
                     rm.msg = 'Unaccesible file';
@@ -72,15 +72,15 @@ export class ProductRepositoryImpl_Local implements ProductRepository {
             else {
 
                 let products = JSON.parse(fileContent);
-                let ids: Array<number> = products.map((item: Product) => item.id)
-                let newId: number = item.id !== 0 ? item.id : Math.max(...ids) + 1;
-                let newProducts: Array<Product> = [...products, { ...item, "id": newId }];
+                let ids: Array<number> = products.map((item: Product) => parseInt(item._id))
+                let newId: number = parseInt(item._id) !== 0 ? parseInt(item._id) : Math.max(...ids) + 1;
+                let newProducts: Array<Product> = [...products, { ...item, "_id": newId }];
 
                 try {
                     await fs.promises.writeFile(`${PATH}`, JSON.stringify(newProducts));
                     rm.isSuccess = true;
                     rm.msg = "Product saved!";
-                    rm.entity = { ...item, "id": newId };
+                    rm.entity = { ...item, "_id": newId.toString() };
                 } catch (error2) {
                     rm.isSuccess = false;
                     rm.msg = 'Unaccesible file';
@@ -102,7 +102,7 @@ export class ProductRepositoryImpl_Local implements ProductRepository {
 
     updateByItem = async (item: Product): Promise<ResponseModel<Product>> => {
 
-        const response: ResponseModel<Product> = await this.deleteById(item.id);
+        const response: ResponseModel<Product> = await this.deleteById(item._id);
 
         if (response.isSuccess === true) {
             const responseUpdate: ResponseModel<Product> = await this.saveItem(item);
@@ -113,7 +113,7 @@ export class ProductRepositoryImpl_Local implements ProductRepository {
         }
     }
 
-    deleteById = async (id: number): Promise<ResponseModel<Product>> => {
+    deleteById = async (id: string): Promise<ResponseModel<Product>> => {
         let rm = new ResponseModel<Product>();
         try {
             let fileContent = await fs.promises.readFile(`${PATH}`, 'utf-8');
@@ -124,7 +124,7 @@ export class ProductRepositoryImpl_Local implements ProductRepository {
             } else {
 
                 let products = JSON.parse(fileContent);
-                let newProducts = products.filter((item: Product) => item.id !== id)
+                let newProducts = products.filter((item: Product) => item._id !== id)
                 await fs.promises.writeFile(`${PATH}`, JSON.stringify(newProducts));
 
                 rm.isSuccess = true;

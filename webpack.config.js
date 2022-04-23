@@ -1,5 +1,10 @@
+const dotenv = require('dotenv');
+const webpack = require('webpack');
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
+
+// Parsing the env file.
+dotenv.config({ path: "./prod.env" });
 
 module.exports = {
     mode: 'production',
@@ -31,5 +36,10 @@ module.exports = {
                 },
             }
         ]
-    }
+    },
+    plugins: [
+        new webpack.DefinePlugin({
+            "process.env": JSON.stringify(process.env)
+        })
+    ]
 }

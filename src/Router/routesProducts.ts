@@ -12,7 +12,7 @@ const service = Services.productService;
 //  Routes middleware
 routerProductos.get('/:id?', async (req, res) => {
     const { id } = req.params;
-    let response = await service.findById(id === undefined ? 0 : parseInt(id));
+    let response = await service.findById(id === undefined ? '0' : id);
     res.json(response);
 })
 
@@ -51,7 +51,7 @@ routerProductos.delete('/:id?/:administrador', async (req, res) => {
     const { administrador } = req.params;
 
     if (administrador === 'true') {
-        const id: number = req.params.id === undefined ? 0 : parseInt(req.params.id);
+        const id: string = req.params.id === undefined ? '0' : req.params.id;
         let response = await service.deleteById(id);
         res.json(response);
     } else {

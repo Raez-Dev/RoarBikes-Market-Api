@@ -8,7 +8,7 @@ export class ShoppingCartServiceImpl implements ShoppingCartService {
 
     constructor(private repository: ShoppingCartRepository) { }
     
-    findProductsByIdShoppingCart(id: number): Promise<ResponseModel<Product>> {
+    findProductsByIdShoppingCart(id: string): Promise<ResponseModel<Product>> {
         return this.repository.findProductsByIdShoppingCart(id);
     }
     createCart(): Promise<ResponseModel<ShoppingCart>> {
@@ -17,10 +17,10 @@ export class ShoppingCartServiceImpl implements ShoppingCartService {
     addProductToCart(item: ShoppingCart): Promise<ResponseModel<ShoppingCart>> {
         return this.repository.addProductToCart(item);
     }
-    deleteCartById(id: number): Promise<ResponseModel<String>> {
+    deleteCartById(id: string): Promise<ResponseModel<String>> {
         return this.repository.deleteCartById(id);
     }
-    deleteProductCartById(idCart: number,idProd: number): Promise<ResponseModel<String>> {
+    deleteProductCartById(idCart: string,idProd: string): Promise<ResponseModel<String>> {
         return this.repository.deleteProductCartById(idCart,idProd);
     }    
 }

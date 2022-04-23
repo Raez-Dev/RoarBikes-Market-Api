@@ -2,7 +2,7 @@ import { Product } from "./Product";
 
 export class ShoppingCart {
     constructor(
-        public id: number,
+        public _id: string,
         public timestamp: number,
         public productos: Array<Product>
     ) { }

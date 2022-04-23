@@ -1,9 +1,10 @@
 import express from "express";
+import config from "./Config/config"; 
 import { routesProducts, routesShoppingCarts } from "./Router/routes";
 
 //  Constants
 const app = express();
-const PORT: number = 8080;
+const PORT: number = config.PORT;
 
 //  Config Middleware
 app.use(express.json());

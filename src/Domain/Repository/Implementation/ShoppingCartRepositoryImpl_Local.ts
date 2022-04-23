@@ -9,7 +9,7 @@ const PATH: string = './dist/resources/ShoppingCarts.txt';
 
 export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository {
 
-    async findProductsByIdShoppingCart(id: number): Promise<ResponseModel<Product>> {
+    async findProductsByIdShoppingCart(id: string): Promise<ResponseModel<Product>> {
         let rm = new ResponseModel<Product>();
 
         try {
@@ -20,7 +20,7 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
                 rm.msg = "Empty cart list";
             } else {
                 let shoppingCartList: Array<ShoppingCart> = JSON.parse(fileContent);
-                let shoppingCartListObj: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart.id === id);
+                let shoppingCartListObj: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart._id === id);
                 if (shoppingCartListObj.length === 0) {
                     rm.isSuccess = false;
                     rm.msg = "Cart not found!";
@@ -51,7 +51,7 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
 
                 let shoppingCart: ShoppingCart;
                 shoppingCart = {
-                    id: 1,
+                    _id: '1',
                     timestamp: Date.now(),
                     productos: []
                 };
@@ -73,11 +73,11 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
             else {
 
                 let shoppingCartList = JSON.parse(fileContent);
-                let ids: Array<number> = shoppingCartList.map((item: ShoppingCart) => item.id)
+                let ids: Array<number> = shoppingCartList.map((item: ShoppingCart) => item._id)
                 let newId: number = Math.max(...ids) + 1;
                 let shoppingCart: ShoppingCart;
                 shoppingCart = {
-                    id: newId,
+                    _id: newId.toString(),
                     timestamp: Date.now(),
                     productos: []
                 };
@@ -120,8 +120,8 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
                 try {
 
                     let shoppingCartList: Array<ShoppingCart> = JSON.parse(fileContent);
-                    let shoppingCartListNew: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart.id !== item.id);
-                    let shoppingCartListObj: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart.id === item.id);
+                    let shoppingCartListNew: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart._id !== item._id);
+                    let shoppingCartListObj: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart._id === item._id);
 
                     if (shoppingCartListObj.length === 0) {
                         rm.isSuccess = true;
@@ -129,7 +129,7 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
                     } else {
                         let shoppingCart: ShoppingCart = shoppingCartListObj[0];
                         let newProducts: Array<Product> = shoppingCart?.productos.concat(item.productos).filter(
-                            (p: Product, i: number, arr: Array<Product>) => arr.findIndex((t: Product) => t.id === p.id) === i
+                            (p: Product, i: number, arr: Array<Product>) => arr.findIndex((t: Product) => t._id === p._id) === i
                         );
 
                         shoppingCart = { ...shoppingCart, "productos": newProducts };
@@ -155,7 +155,7 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
             return rm;
         }
     }
-    async deleteCartById(id: number): Promise<ResponseModel<String>> {
+    async deleteCartById(id: string): Promise<ResponseModel<String>> {
         let rm = new ResponseModel<String>();
 
         try {
@@ -168,8 +168,8 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
                 try {
 
                     let shoppingCartList: Array<ShoppingCart> = JSON.parse(fileContent);
-                    let shoppingCartListNew: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart.id !== id);
-                    let shoppingCartListObj: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart.id === id);
+                    let shoppingCartListNew: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart._id !== id);
+                    let shoppingCartListObj: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart._id === id);
 
                     if (shoppingCartListObj.length === 0) {
                         rm.isSuccess = true;
@@ -196,7 +196,7 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
             return rm;
         }
     }
-    async deleteProductCartById(idCart: number, idProd: number): Promise<ResponseModel<String>> {
+    async deleteProductCartById(idCart: string, idProd: string): Promise<ResponseModel<String>> {
         let rm = new ResponseModel<String>();
 
         try {
@@ -209,8 +209,8 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
                 try {
 
                     let shoppingCartList: Array<ShoppingCart> = JSON.parse(fileContent);
-                    let shoppingCartListNew: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart.id !== idCart);
-                    let shoppingCartListObj: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart.id === idCart);
+                    let shoppingCartListNew: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart._id !== idCart);
+                    let shoppingCartListObj: Array<ShoppingCart> = shoppingCartList.filter((sCart: ShoppingCart) => sCart._id === idCart);
 
                     if (shoppingCartListObj.length === 0) {
                         rm.isSuccess = true;
@@ -219,11 +219,11 @@ export class ShoppingCartRepositoryImpl_Local implements ShoppingCartRepository 
                         let shoppingCart: ShoppingCart = shoppingCartListObj[0];
                         let productsList: Array<Product> = shoppingCart?.productos;
 
-                        if (productsList.filter((p: Product) => p.id === idProd).length === 0) {
+                        if (productsList.filter((p: Product) => p._id === idProd).length === 0) {
                             rm.isSuccess = false;
                             rm.msg = "Product not found in Shopping Cart!";
                         } else {
-                            let newProducts = productsList.filter((p: Product) => p.id !== idProd);
+                            let newProducts = productsList.filter((p: Product) => p._id !== idProd);
                             shoppingCart = { ...shoppingCart, "productos": newProducts };
                             await fs.promises.writeFile(`${PATH}`, JSON.stringify([...shoppingCartListNew, shoppingCart]));
                             rm.isSuccess = true;

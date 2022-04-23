@@ -16,7 +16,7 @@ const serviceProducts = Services.productService;
 //  Me permite listar todos los productos guardados en el carrito
 routerShoppingCart.get('/:id/productos', async (req, res) => {
     const { id } = req.params;
-    let response = await service.findProductsByIdShoppingCart(parseInt(id));
+    let response = await service.findProductsByIdShoppingCart(id);
     res.json(response);
 })
 
@@ -28,42 +28,54 @@ routerShoppingCart.post('/', async (req, res) => {
 
 //  Para incorporar productos al carrito por su id de producto
 routerShoppingCart.post('/:id/productos', async (req, res) => {
+
     const { id } = req.params;
-    const products: Array<number> = req.body;
+    const products: Array<string> = req.body;
     let productsList: Array<Product> = [];
 
+    let responseShopping = await service.findProductsByIdShoppingCart(id);
 
-    for await (const item of products) {        
-        const response: ResponseModel<Product> = await serviceProducts.findById(item);
-        if (response.isSuccess === true) {
-            if (response.entity !== undefined) {
-                productsList.push(response.entity);
+    if (responseShopping.isSuccess === false && responseShopping.error !== undefined) {
+        res.json(responseShopping);
+
+    } else {
+        for await (const item of products) {
+
+            const response: ResponseModel<Product> = await serviceProducts.findById(item);
+            if (response.isSuccess === true) {
+                if (response.data !== undefined) {
+                    productsList.push(response.data[0]);
+                }
+            } else {
+                res.json(response);
+                return;
             }
         }
-    }
 
-    const shoppingCart: ShoppingCart = {
-        id: parseInt(id),
-        timestamp: new Date().getTime(),
-        productos: productsList
-    }
+        const shoppingCart: ShoppingCart = {
+            _id: id,
+            timestamp: new Date().getTime(),
+            productos: productsList
+        }
 
-    let response = await service.addProductToCart(shoppingCart);
-    res.json(response);
+        let response = await service.addProductToCart(shoppingCart);
+        res.json(response);
+        //res.json();
+    }
 
 })
 
 //  Vacía un carrito y lo elimina
 routerShoppingCart.delete('/:id', async (req, res) => {
     const { id } = req.params;
-    let response = await service.deleteCartById(parseInt(id));
+    let response = await service.deleteCartById(id);
     res.json(response);
 })
 
 //  Eliminar un producto del carrito por su id de carrito y de producto
 routerShoppingCart.delete('/:id/productos/:id_prod', async (req, res) => {
     const { id, id_prod } = req.params;
-    let response = await service.deleteProductCartById(parseInt(id), parseInt(id_prod));
+    let response = await service.deleteProductCartById(id, id_prod);
     res.json(response);
 })
 

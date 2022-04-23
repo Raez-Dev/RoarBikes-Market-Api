@@ -7,7 +7,7 @@ export class ProductServiceImpl implements ProductService {
 
     constructor(private repository: ProductRepository) { }
 
-    async findById(id: number): Promise<ResponseModel<Product>> {        
+    async findById(id: string): Promise<ResponseModel<Product>> {        
         return await this.repository.findById(id);
     }
     async saveItem(item: Product): Promise<ResponseModel<Product>> {
@@ -16,7 +16,7 @@ export class ProductServiceImpl implements ProductService {
     async updateByItem(item: Product): Promise<ResponseModel<Product>> {
         return await this.repository.updateByItem(item);
     }
-    async deleteById(id: number): Promise<ResponseModel<Product>> {
+    async deleteById(id: string): Promise<ResponseModel<Product>> {
         return await this.repository.deleteById(id);
     }
 
